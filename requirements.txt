@@ -1,7 +1,7 @@
-fastapi
+fastapi==0.75.1
 gunicorn
 uvicorn
-pydantic
+pydantic==1.9.0
 python-dotenv
 sqlalchemy
 psycopg2-binary
