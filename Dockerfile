@@ -16,5 +16,5 @@ RUN mkdir /app
 WORKDIR /app
 COPY --from=builder /app/venv /app/venv
 COPY src /app/src
-CMD . venv/bin/activate ; gunicorn --chdir src WeGo.app:app -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000
-EXPOSE 8000
+EXPOSE 8080
+CMD . venv/bin/activate ; cd src ; python -m WeGo
