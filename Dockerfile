@@ -1,9 +1,20 @@
-FROM python
-
+FROM python:3.9-slim-buster AS builder
+RUN mkdir /app
 WORKDIR /app
+COPY requirements.txt .
+RUN apt-get update && apt-get install -y --no-install-recommends gcc make libc6-dev \
+  && rm -rf /var/lib/apt/lists/* \
+  && python3 -m venv venv \
+  && . venv/bin/activate \
+  && pip install --upgrade pip \
+  && pip install -r requirements.txt
 
-COPY . .
 
-RUN pip install -r requirements.txt
-
-CMD ["venv\\Script\\activate\n" "cd src\n", "python", "-m", "src/WeGo"]
+FROM python:3.9-slim-buster
+ENV PYTHONUNBUFFERED=1
+RUN mkdir /app
+WORKDIR /app
+COPY --from=builder /app/venv /app/venv
+COPY src /app/src
+CMD . venv/bin/activate ; gunicorn --chdir src WeGo.app:app -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8000
+EXPOSE 8000
