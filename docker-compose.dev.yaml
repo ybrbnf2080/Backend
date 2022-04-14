@@ -1,12 +1,26 @@
 version: '3'
 services:
+  
+
+  server: 
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 0.0.0.0:8000:8000
+    environment:
+      EE_DATABASE_URL: "postgresql://root:root@db:5432/employment_exchange"
+
   db:
     image:  postgres:11
     ports:
       - 32700:5432
     volumes:
-      - ./data:/var/lib/postgresql/data
+      - postgresql_data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER:  root
       POSTGRES_PASSWORD:  root
       POSTGRES_DB: employment_exchange
+volumes:
+  postgresql_data:
