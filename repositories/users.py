@@ -1,6 +1,6 @@
 import datetime
 from typing import List, Optional
-from db.users import users
+from db.users import User as users
 from models.user import User, UserIn
 from core.security import hash_password
 from .base import BaseRepository

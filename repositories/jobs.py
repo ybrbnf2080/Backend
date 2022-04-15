@@ -1,7 +1,7 @@
 from typing import List, Optional
 import datetime
 from models.jobs import Job, JobIn
-from db.jobs import jobs
+from db.jobs import Job as jobs
 from .base import BaseRepository
 
 class JobRepository(BaseRepository):

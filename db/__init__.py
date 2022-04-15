@@ -1,5 +1,7 @@
-from .users import users
-from .jobs import jobs
-from .base import metadata, engine
+from .users import User
+from .jobs import Job
+from .posts import  Post
+from .base import Base, engine
 
-metadata.create_all(bind=engine)
+def init_db() :
+    Base.metadata.create_all(bind=engine)

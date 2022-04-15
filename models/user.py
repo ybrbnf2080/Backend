@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional, List, String, Array
+from typing import Optional, List
 from pydantic import BaseModel, EmailStr, validator, constr
 from db.base import Base
 
@@ -29,6 +29,10 @@ class User(BaseModel):
     latest_location_id: str
     created_at: datetime.datetime
     updated_at: datetime.datetime
+
+    class Config:
+        orm_mode = True
+
 
 class UserIn(BaseModel):
     name: str
