@@ -6,3 +6,6 @@ jobs:
     steps: 
       - uses: actions/checkout@v3
       - run: docker-compose -f ./docker-compose.dev.yaml up -d
+      - run: systemctl status docker.service
+      - run: w
+    
