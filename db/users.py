@@ -1,4 +1,5 @@
 from sqlalchemy import ARRAY, Column, Integer, DateTime, Boolean, String 
+from sqlalchemy.orm import relationship
 from .base import Base
 import datetime
 
@@ -31,3 +32,5 @@ class User(Base):
     created_at =  Column(DateTime, default=datetime.datetime.utcnow)
     updated_at =  Column(DateTime, default=datetime.datetime.utcnow)
 
+    jobs= relationship("Job", back_populates="user")
+    posts= relationship("Post", back_populates="user")
