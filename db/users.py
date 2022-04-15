@@ -1,15 +1,33 @@
-import sqlalchemy
-from .base import metadata
+from sqlalchemy import ARRAY, Column, Integer, DateTime, Boolean, String 
+from .base import Base
 import datetime
 
-users = sqlalchemy.Table(
-    "users", 
-    metadata,
-    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True, autoincrement=True, unique=True),
-    sqlalchemy.Column("email", sqlalchemy.String, primary_key=True, unique=True),
-    sqlalchemy.Column("name", sqlalchemy.String),
-    sqlalchemy.Column("hashed_password", sqlalchemy.String),
-    sqlalchemy.Column("is_company", sqlalchemy.Boolean),
-    sqlalchemy.Column("created_at", sqlalchemy.DateTime, default=datetime.datetime.utcnow),
-    sqlalchemy.Column("updated_at", sqlalchemy.DateTime, default=datetime.datetime.utcnow)
-)
+class User(Base):
+    __tablename__ = "users"
+    
+    id  =  Column(Integer, primary_key=True, autoincrement=True),
+    username =  Column(String, nullable=False, unique=True)
+    full_name =  Column(String,)
+    email = Column(String, nullable=False, unique=True)
+    hashed_password =  Column(String, nullable=False)
+    profile_photo_url = Column(String, )
+    profile_photo_url_hd = Column(String)
+    biography = Column(String)
+    external_url = Column(String, unique=True)
+    business_category = Column(ARRAY(String), )
+    age_approx = Column(Integer, )
+    age_group = Column(String, )
+    gender = Column(String)
+    langs = Column(ARRAY(String), )
+    is_private = Column(Boolean)
+    is_verified = Column(Boolean)
+    is_business_account = Column(Boolean)
+    is_company = Column(Boolean)
+    followers_count = Column(Integer, )
+    followings_count = Column(Integer, )
+    posts_count = Column(Integer, )
+    highlight_reels_count = Column(Integer, )
+    latest_location_id = Column(Integer, )
+    created_at =  Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at =  Column(DateTime, default=datetime.datetime.utcnow)
+
