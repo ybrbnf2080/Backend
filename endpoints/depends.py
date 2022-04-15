@@ -1,17 +1,26 @@
+from re import U
 from fastapi import Depends, HTTPException, status
 from repositories.users import UserRepository
 from repositories.jobs import JobRepository
-from db.base import database
+from db.base import SessionLocal as database ### ! CHANGE
 from core.security import JWTBearer, decode_access_token
 from models.user import User
 
 
 def get_user_repository() -> UserRepository:
-    return UserRepository(database)
+    userRepository = UserRepository(database)
+    try:
+        yield userRepository
+    finally:
+        userRepository.database.close()
 
 
 def get_job_repository() -> JobRepository:
-    return JobRepository(database)
+    jobRepository = JobRepository(database)
+    try:
+        yield jobRepository
+    finally:
+        jobRepository.database.close()
 
 
 async def get_current_user(

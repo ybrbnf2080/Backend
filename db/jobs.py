@@ -1,17 +1,18 @@
-import sqlalchemy
-from .base import metadata
+from sqlalchemy import ARRAY, Column, Integer, DateTime, Boolean, String, ForeignKey
+from sqlalchemy.orm import relationship
+from .base import Base
 import datetime
 
-jobs = sqlalchemy.Table(
-    "jobs", 
-    metadata,
-    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True, autoincrement=True, unique=True),
-    sqlalchemy.Column("user_id", sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'), nullable=False),
-    sqlalchemy.Column("title", sqlalchemy.String),
-    sqlalchemy.Column("description", sqlalchemy.String),
-    sqlalchemy.Column("salary_from", sqlalchemy.Integer),
-    sqlalchemy.Column("salary_to", sqlalchemy.Integer),
-    sqlalchemy.Column("is_active", sqlalchemy.Boolean),
-    sqlalchemy.Column("created_at", sqlalchemy.DateTime, default=datetime.datetime.utcnow),
-    sqlalchemy.Column("updated_at", sqlalchemy.DateTime, default=datetime.datetime.utcnow)
-)
+class Job(Base):
+    __tablename__ = "jobs"
+    id = Column( Integer, primary_key=True, autoincrement=True, unique=True)
+    user_id = Column( Integer, ForeignKey('users.id'), nullable=False)
+    title = Column( String),
+    description = Column( String)
+    salary_from = Column( Integer)
+    salary_to = Column( Integer)
+    is_active = Column( Boolean)
+    created_at = Column( DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column( DateTime, default=datetime.datetime.utcnow)
+
+    user = relationship("User", back_populates="jobs")
