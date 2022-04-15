@@ -10,7 +10,7 @@ services:
     ports:
       - 0.0.0.0:8000:8000
     environment:
-      EE_DATABASE_URL: "postgresql://root:root@db:5432/employment_exchange"
+      EE_DATABASE_URL: "postgresql://root:root@db:5432/postgres"
 
   db:
     image:  postgres:11
@@ -21,6 +21,15 @@ services:
     environment:
       POSTGRES_USER:  root
       POSTGRES_PASSWORD:  root
-      POSTGRES_DB: employment_exchange
+      POSTGRES_DB: postgres
+
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8082:8080
+    depends_on:
+      - db
 volumes:
   postgresql_data:
