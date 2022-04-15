@@ -2,7 +2,7 @@ name: test-github-actions
 on: [push]
 jobs: 
   test: 
-    runs-on: ubuntu-latest
+    runs-on: server
     steps: 
       - uses: actions/checkout@v3
       - run: ls 
