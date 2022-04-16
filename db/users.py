@@ -1,4 +1,4 @@
-from sqlalchemy import ARRAY, Column, Integer, DateTime, Boolean, String 
+from sqlalchemy import ARRAY, BigInteger, Column, Integer, DateTime, Boolean, String 
 from sqlalchemy.orm import relationship
 from .base import Base
 import datetime
@@ -6,7 +6,7 @@ import datetime
 class User(Base):
     __tablename__ = "users"
     
-    id  =  Column(Integer, primary_key=True, autoincrement=True)
+    id  =  Column(BigInteger, primary_key=True, autoincrement=True)
     username =  Column(String, nullable=False, unique=True)
     full_name =  Column(String,)
     email = Column(String, nullable=False, unique=True)
