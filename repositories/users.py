@@ -34,7 +34,7 @@ class UserRepository(BaseRepository):
         values = {**user.dict()}
         values.pop("id", None)
         query = insert(users).values(**values).returning(users)
-        result = self.database.execute(query).one()
+        result = self.database.execute(query).one() # returned obj ? :/ ?
         self.database.commit()
         user = result._mapping
         return user
@@ -61,10 +61,8 @@ class UserRepository(BaseRepository):
         query = select(users).filter(users.email == email)
         print(query)
         user = self.database.execute(query)
-        user_obj = user.scalars().one_or_none()
-        print(type(user_obj))
-        print(f"{user_obj.username} {user_obj.full_name}")
-            
+        user_obj = user.scalars().one_or_none() # returned ROW obj
+           
         if user is None:
             return None
         return User.parse_obj(user_obj.__dict__)
