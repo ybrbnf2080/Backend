@@ -6,7 +6,7 @@ from db.base import Base
 class User(BaseModel):
     id : Optional[str] = None
     username: str
-    full_name: str
+    full_name: Optional[str]
     email: EmailStr
     hashed_password: str
     profile_photo_url: Optional[str] 

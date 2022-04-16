@@ -15,11 +15,11 @@ class UserRepository(BaseRepository):
         return result
 
     async def get_by_id(self, id: int) -> Optional[User]:
-        query = select(users).where(users.c.id == id)
-        user = self.database.execute(query).fetchone()
+        query = select(users).where(users.id == id)
+        user = self.database.execute(query).scalars().one()
         if user is None:
             return None
-        return User.parse_obj(user)
+        return User.parse_obj(user.__dict__)
 
     async def create(self, u: UserIn) -> User:
         user = User(
@@ -36,13 +36,13 @@ class UserRepository(BaseRepository):
         query = insert(users).values(**values).returning(users)
         result = self.database.execute(query).one() # returned obj ? :/ ?
         self.database.commit()
-        user = result._mapping
-        return user
+        return User.parse_obj(result._mapping)
 
     async def update(self, id: int, u: UserIn) -> User:
         user = User(
             id=id,
-            username=u.name,
+            username=u.username,
+            full_name= u.full_name,
             email=u.email,
             hashed_password=hash_password(u.password),
             is_company=u.is_company,
@@ -52,10 +52,11 @@ class UserRepository(BaseRepository):
         values = {**user.dict()}
         values.pop("created_at", None)
         values.pop("id", None)
-        query = update(users).where(users.id == id).values(**values)
-        self.database.execute(query)
-        self.database.commit()
-        return user
+        query = update(users).where(users.id == id).values(**values).returning(users)
+        result = self.database.execute(query).one()
+        self.database.commit() 
+        
+        return User.parse_obj(result._mapping)
 
     async def get_by_email(self, email: str) -> User:
         query = select(users).filter(users.email == email)
