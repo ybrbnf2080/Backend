@@ -1,5 +1,7 @@
 from typing import List, Optional
 import datetime
+
+from sqlalchemy import delete, insert, select
 from models.jobs import Job, JobIn
 from db.jobs import Job as jobs
 from .base import BaseRepository
@@ -20,8 +22,8 @@ class JobRepository(BaseRepository):
         )
         values = {**job.dict()}
         values.pop("id", None)
-        query = jobs.insert().values(**values)
-        job.id = await self.database.execute(query=query)
+        query = insert(jobs).values(**values).returning(jobs.id)
+        job.id = self.database.execute(query).first()
         return job
 
     async def update(self, id: int, user_id: int, j: JobIn) -> Job:
@@ -39,21 +41,21 @@ class JobRepository(BaseRepository):
         values = {**job.dict()}
         values.pop("id", None)
         values.pop("created_at", None)
-        query = jobs.update().where(jobs.c.id==id).values(**values)
-        await self.database.execute(query=query)
+        query = jobs.update().where(jobs.id==id).values(**values)
+        self.database.execute(query)
         return job
 
     async def get_all(self, limit: int = 100, skip: int = 0) -> List[Job]:
-        query = jobs.select().limit(limit).offset(skip)
-        return await self.database.fetch_all(query=query)
+        query = select(jobs).limit(limit).offset(skip)
+        return self.database.execute(query).scalars().all()
     
     async def delete(self, id: int):
-        query = jobs.delete().where(jobs.c.id==id)
-        return await self.database.execute(query=query)
+        query = delete(jobs).where(jobs.id==id).returning()
+        return self.database.execute(query).first()
 
     async def get_by_id(self, id: int) -> Optional[Job]:
-        query = jobs.select().where(jobs.c.id==id)
-        job = await self.database.fetch_one(query=query)
+        query = select(jobs).where(jobs.id==id)
+        job = self.database.execute(query).scalars().one()
         if job is None:
             return None
-        return Job.parse_obj(job)
+        return Job.parse_obj(job.__dict__)

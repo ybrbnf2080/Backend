@@ -4,24 +4,25 @@ from db.users import User as users
 from models.user import User, UserIn
 from core.security import hash_password
 from .base import BaseRepository
-
+from sqlalchemy import insert, select, update
 
 class UserRepository(BaseRepository):
 
     async def get_all(self, limit: int = 100, skip: int = 0) -> List[User]:
-        query = users.select().limit(limit).offset(skip)
-        return await self.database.fetch_all(query=query)
+        query = select(users).limit(limit).offset(skip)
+        return self.database.execute(query).scalars().all()
 
     async def get_by_id(self, id: int) -> Optional[User]:
-        query = users.select().where(users.c.id == id)
-        user = await self.database.fetch_one(query)
+        query = select(users).where(users.c.id == id)
+        user = self.database.execute(query).fetchone()
         if user is None:
             return None
         return User.parse_obj(user)
 
     async def create(self, u: UserIn) -> User:
         user = User(
-            name=u.name,
+            username=u.username,
+            full_name=u.full_name,
             email=u.email,
             hashed_password=hash_password(u.password),
             is_company=u.is_company,
@@ -30,30 +31,38 @@ class UserRepository(BaseRepository):
         )
         values = {**user.dict()}
         values.pop("id", None)
-        query = users.insert().values(**values)
-        user.id = await self.database.execute(query)
+        query = insert(users).values(**values).returning(users.id)
+        lol = self.database.execute(query).first()
+        self.database.commit()
+        user.id = lol[0]
         return user
 
     async def update(self, id: int, u: UserIn) -> User:
         user = User(
             id=id,
-            name=u.name,
+            username=u.name,
             email=u.email,
-            hashed_password=hash_password(u.password2),
+            hashed_password=hash_password(u.password),
             is_company=u.is_company,
-            created_at=datetime.datetime.utcnow(),
+            created_at=datetime.datetime.utcnow(), 
             updated_at=datetime.datetime.utcnow(),
         )
         values = {**user.dict()}
         values.pop("created_at", None)
         values.pop("id", None)
-        query = users.update().where(users.c.id == id).values(**values)
-        await self.database.execute(query)
+        query = update(users).where(users.id == id).values(**values)
+        self.database.execute(query)
+        self.database.commit()
         return user
 
     async def get_by_email(self, email: str) -> User:
-        query = users.select().where(users.c.email == email)
-        user = await self.database.fetch_one(query)
+        query = select(users).filter(users.email == email)
+        print(query)
+        user = self.database.execute(query)
+        user_obj = user.scalars().one_or_none()
+        print(type(user_obj))
+        print(f"{user_obj.username} {user_obj.full_name}")
+            
         if user is None:
             return None
-        return User.parse_obj(user)
+        return User.parse_obj(user_obj.__dict__)
