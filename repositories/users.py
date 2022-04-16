@@ -22,8 +22,9 @@ class UserRepository(BaseRepository):
         return User.parse_obj(user.__dict__)
 
     async def create(self, u: UserIn) -> User:
+        if (u.username is None) : u.username = (u.full_name + hash_password(u.email)[-2:].upper() )
         user = User(
-            username=u.username,
+            username=u.username  ,
             full_name=u.full_name,
             email=u.email,
             hashed_password=hash_password(u.password),

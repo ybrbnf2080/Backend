@@ -35,7 +35,7 @@ class User(BaseModel):
 
 
 class UserIn(BaseModel):
-    username: str
+    username: str | None =None
     full_name: str
     email: EmailStr
     password: constr(min_length=8)
