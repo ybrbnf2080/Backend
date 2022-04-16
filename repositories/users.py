@@ -1,5 +1,6 @@
 import datetime
 from typing import List, Optional
+from unittest import result
 from db.users import User as users
 from models.user import User, UserIn
 from core.security import hash_password
@@ -10,7 +11,8 @@ class UserRepository(BaseRepository):
 
     async def get_all(self, limit: int = 100, skip: int = 0) -> List[User]:
         query = select(users).limit(limit).offset(skip)
-        return self.database.execute(query).scalars().all()
+        result = self.database.execute(query).scalars().all()
+        return result
 
     async def get_by_id(self, id: int) -> Optional[User]:
         query = select(users).where(users.c.id == id)
@@ -31,10 +33,10 @@ class UserRepository(BaseRepository):
         )
         values = {**user.dict()}
         values.pop("id", None)
-        query = insert(users).values(**values).returning(users.id)
-        lol = self.database.execute(query).first()
+        query = insert(users).values(**values).returning(users)
+        result = self.database.execute(query).one()
         self.database.commit()
-        user.id = lol[0]
+        user = result._mapping
         return user
 
     async def update(self, id: int, u: UserIn) -> User:
