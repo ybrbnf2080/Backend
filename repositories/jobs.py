@@ -22,9 +22,10 @@ class JobRepository(BaseRepository):
         )
         values = {**job.dict()}
         values.pop("id", None)
-        query = insert(jobs).values(**values).returning(jobs.id)
-        job.id = self.database.execute(query).first()
-        return job
+        query = insert(jobs).values(**values).returning(jobs)
+        result = self.database.execute(query).first()
+        self.database.commit()
+        return Job.parse_obj(result._mapping)
 
     async def update(self, id: int, user_id: int, j: JobIn) -> Job:
         job = Job(
@@ -41,9 +42,10 @@ class JobRepository(BaseRepository):
         values = {**job.dict()}
         values.pop("id", None)
         values.pop("created_at", None)
-        query = jobs.update().where(jobs.id==id).values(**values)
-        self.database.execute(query)
-        return job
+        query = jobs.update().where(jobs.id==id).values(**values).returning(jobs)
+        result = self.database.execute(query).first()
+        self.database.commit() 
+        return Job.parse_obj(job._mapping)
 
     async def get_all(self, limit: int = 100, skip: int = 0) -> List[Job]:
         query = select(jobs).limit(limit).offset(skip)
