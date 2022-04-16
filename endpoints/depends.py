@@ -1,14 +1,15 @@
 from re import U
+from sqlalchemy.orm import scoped_session
 from fastapi import Depends, HTTPException, status
 from repositories.users import UserRepository
 from repositories.jobs import JobRepository
-from db.base import SessionLocal as database ### ! CHANGE
+from db.base import Session #as database ### ! CHANGE
 from core.security import JWTBearer, decode_access_token
 from models.user import User
 
 
 def get_user_repository() -> UserRepository:
-    userRepository = UserRepository(database)
+    userRepository = UserRepository(Session())
     try:
         yield userRepository
     finally:
@@ -16,7 +17,7 @@ def get_user_repository() -> UserRepository:
 
 
 def get_job_repository() -> JobRepository:
-    jobRepository = JobRepository(database)
+    jobRepository = JobRepository(Session())
     try:
         yield jobRepository
     finally:

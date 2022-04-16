@@ -1,2 +1,4 @@
 .env 
 .trash
+*.pyc
+__pycache__
