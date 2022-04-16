@@ -1,3 +1,4 @@
+from re import I
 from typing import List
 from models.jobs import Job, JobIn
 from models.user import User
@@ -13,6 +14,12 @@ async def read_jobs(
     skip: int = 0,
     jobs: JobRepository = Depends(get_job_repository)):
     return await jobs.get_all(limit=limit, skip=skip)
+
+@router.get("/{jobs_id}", response_model=Job)
+async def read_jobs(
+    jobs_id: int,
+    jobs: JobRepository = Depends(get_job_repository)):
+    return await jobs.get_by_id(jobs_id)
 
 @router.post("/", response_model=Job)
 async def create_job(
