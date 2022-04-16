@@ -10,9 +10,18 @@ router = APIRouter()
 @router.get("/", response_model=List[User])
 async def read_users(
     users: UserRepository = Depends(get_user_repository),
+    id: int = None,
     limit: int = 100, 
     skip: int = 0):
-    return await users.get_all(limit=limit, skip=0)
+    if id is None:
+        return await users.get_all(limit=limit, skip=0)
+    else: return await users.get_by_id(id=id)
+    
+@router.get("/{user_id}", response_model=User)
+async def read_users(
+    users: UserRepository = Depends(get_user_repository),
+    user_id: int = None,):
+    return await users.get_by_id(id=user_id)
 
 @router.post("/", response_model=User)
 async def create_user(
