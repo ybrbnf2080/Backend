@@ -5,6 +5,7 @@ import datetime
 
 class Job(Base):
     __tablename__ = "jobs"
+    
     id = Column( Integer, primary_key=True, autoincrement=True, unique=True)
     user_id = Column( Integer, ForeignKey('users.id'), nullable=False)
     title = Column( String)

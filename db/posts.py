@@ -5,6 +5,7 @@ import datetime
 
 class Post(Base):
     __tablename__ = "posts"
+    
     id = Column(Integer, primary_key=True, autoincrement=True, unique=True)
     user_id = Column( Integer, ForeignKey('users.id'), nullable=False)
     shortcode = Column(String, unique=True)
