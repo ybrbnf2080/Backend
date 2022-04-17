@@ -1,26 +1,41 @@
 import datetime
 from typing import List, Optional
 from unittest import result
-from db.users import User as users
+from db.models.users import User as Users
 from models.user import User, UserIn
 from core.security import hash_password
 from .base import BaseRepository
 from sqlalchemy import insert, select, update
 
+
+
 class UserRepository(BaseRepository):
 
     async def get_all(self, limit: int = 100, skip: int = 0) -> List[User]:
-        query = select(users).limit(limit).offset(skip)
+        query = select(Users).limit(limit).offset(skip)
         result = self.database.execute(query).scalars().all()
-        return result
+        users = map(UserRepository.serilaese, result)
+        clearUsers = map(UserRepository.delete_password, users)
+        return list(clearUsers)
 
     async def get_by_id(self, id: int) -> Optional[User]:
-        query = select(users).where(users.id == id)
-        user = self.database.execute(query).scalars().one()
+        query = select(Users).where(Users.id == id)
+        result = self.database.execute(query).scalars().one_or_none()
+
         if user is None:
             return None
-        return User.parse_obj(user.__dict__)
+        user = UserRepository.serilaese(result)
+        clearUser = UserRepository.delete_password(user)
+        return clearUser
+    
+    async def get_by_email(self, email: str) -> User:
+        query = select(Users).filter(Users.email == email)
+        result = self.database.execute(query).scalars().one_or_none() 
 
+        if result is None:
+            return None
+        return UserRepository.serilaese(result)
+    
     async def create(self, u: UserIn) -> User:
         if (u.username is None) : u.username = (u.full_name + hash_password(u.email)[-2:].upper() )
         user = User(
@@ -34,7 +49,7 @@ class UserRepository(BaseRepository):
         )
         values = {**user.dict()}
         values.pop("id", None)
-        query = insert(users).values(**values).returning(users)
+        query = insert(Users).values(**values).returning(Users)
         result = self.database.execute(query).one() # returned obj ? :/ ?
         self.database.commit()
         return User.parse_obj(result._mapping)
@@ -53,18 +68,17 @@ class UserRepository(BaseRepository):
         values = {**user.dict()}
         values.pop("created_at", None)
         values.pop("id", None)
-        query = update(users).where(users.id == id).values(**values).returning(users)
+        query = update(Users).where(Users.id == id).values(**values).returning(Users)
         result = self.database.execute(query).one()
         self.database.commit() 
         
         return User.parse_obj(result._mapping)
 
-    async def get_by_email(self, email: str) -> User:
-        query = select(users).filter(users.email == email)
-        print(query)
-        user = self.database.execute(query)
-        user_obj = user.scalars().one_or_none() # returned ROW obj
-           
-        if user is None:
-            return None
-        return User.parse_obj(user_obj.__dict__)
+    @staticmethod
+    def serilaese(userRow: any):
+        return User.parse_obj(userRow.__dict__)
+    
+    @staticmethod
+    def delete_password(user: User) :
+        user.hashed_password = None
+        return user

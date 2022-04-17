@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from models.token import Token, Login
-from repositories.users import UserRepository
+from db.repositories.users import UserRepository
 from core.security import verify_password, create_access_token
 from .depends import get_user_repository
 

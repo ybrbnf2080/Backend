@@ -1,8 +1,8 @@
 from re import U
 from sqlalchemy.orm import scoped_session
 from fastapi import Depends, HTTPException, status
-from repositories.users import UserRepository
-from repositories.jobs import JobRepository
+from db.repositories.users import UserRepository
+from db.repositories.jobs import JobRepository
 from db.base import Session #as database ### ! CHANGE
 from core.security import JWTBearer, decode_access_token
 from models.user import User

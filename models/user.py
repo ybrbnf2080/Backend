@@ -8,7 +8,7 @@ class User(BaseModel):
     username: str
     full_name: Optional[str]
     email: EmailStr
-    hashed_password: str
+    hashed_password: Optional[str]
     profile_photo_url: Optional[str] 
     profile_photo_url_hd: Optional[str] 
     biography: Optional[str] 
