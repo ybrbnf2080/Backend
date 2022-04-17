@@ -1,7 +1,7 @@
-from .users import User
-from .jobs import Job
-from .posts import  Post
-from .base import Base, engine
+from .models.users import User
+from .models.jobs import Job
+from .models.posts import  Post
+from db.base import Base, engine
 
-def init_db() :
+def init_db() : # RUDIMENT
     Base.metadata.create_all(bind=engine)

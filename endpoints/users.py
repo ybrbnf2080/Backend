@@ -1,6 +1,6 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
-from repositories.users import UserRepository
+from db.repositories.users import UserRepository
 from models.user import User, UserIn
 from .depends import get_user_repository, get_current_user
 
@@ -23,11 +23,13 @@ async def read_users(
     user_id: int = None,):
     return await users.get_by_id(id=user_id)
 
+
 @router.post("/", response_model=User)
 async def create_user(
     user: UserIn,
     users: UserRepository = Depends(get_user_repository)):
     return await users.create(u=user)
+
 
 @router.put("/", response_model=User)
 async def update_user(
