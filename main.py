@@ -1,9 +1,9 @@
 from fastapi import FastAPI
-from db import init_db
+#from db import init_db
 from endpoints import users, auth, jobs
 import uvicorn
 
-init_db()
+#init_db()
 
 app = FastAPI()
 
