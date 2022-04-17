@@ -9,5 +9,5 @@ jobs:
     steps: 
       - uses: actions/checkout@v3
       - run: chmod 774 *.sh
-      - run: ./delploy.sh
+      - run: ./deploy.sh
       - run: ./migrate.sh
