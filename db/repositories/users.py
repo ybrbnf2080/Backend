@@ -22,7 +22,7 @@ class UserRepository(BaseRepository):
         query = select(Users).where(Users.id == id)
         result = self.database.execute(query).scalars().one_or_none()
 
-        if user is None:
+        if result is None:
             return None
         user = UserRepository.serilaese(result)
         clearUser = UserRepository.delete_password(user)
